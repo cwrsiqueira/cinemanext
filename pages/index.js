@@ -18,6 +18,7 @@ export default function Home({list}) {
         </h1>
 
         <Link href={'/busca'}>Ir para busca</Link>
+        <Link href={'/sobre'}>Sobre</Link>
 
         <ul>
           {list.map(item=>(
