@@ -1,9 +1,18 @@
-/* eslint-disable @next/next/no-img-element */
 import Head from 'next/head'
-import Link from 'next/link'
+import { useState } from 'react'
 import styles from '../styles/Home.module.css'
 
-export default function Home({list}) {
+export default function Busca({list}) {
+    const [searchText, setSearchText] = useState('')
+    const [movieList, setMovieList] = useState([])
+
+    async function handleSearch () {
+        const res = await fetch("http://localhost:3000/api/search/?q="+searchText)
+        const json = await res.json()
+
+        setMovieList(json.list)
+    }
+
   return (
     <div className={styles.container}>
       <Head>
@@ -14,13 +23,22 @@ export default function Home({list}) {
 
       <main className={styles.main}>
         <h1 className={styles.title}>
-         Filmes em Destaque
+         Busca
         </h1>
 
-        <Link href={'/busca'}>Ir para busca</Link>
+        <input type="text" value={searchText} onChange={e=>setSearchText(e.target.value)} placeholder='Buscar por...' />
+        {searchText == '' && 
+          <button onClick={handleSearch} disabled>Buscar</button>
+        }
+        {searchText != '' && 
+          <button onClick={handleSearch}>Buscar</button>
+        }
+        
+
+        <hr/>
 
         <ul>
-          {list.map(item=>(
+          {movieList.map(item=>(
             <li key={item}>
               <a href={`/movie/${item.id}`}>
                 <img src={`https://image.tmdb.org/t/p/original${item.poster_path}`} alt='poster' width={150} layout='fill' /> <br/>
@@ -29,7 +47,6 @@ export default function Home({list}) {
             </li>
           ))}
         </ul>
-
       </main>
 
       <footer className={styles.footer}>
@@ -37,15 +54,4 @@ export default function Home({list}) {
       </footer>
     </div>
   )
-}
-
-export async function getServerSideProps() {
-  const res = await fetch("http://localhost:3000/api/trending")
-  const json = await res.json()
-
-  return {
-    props: {
-      list: json.list
-    }
-  }
 }
